@@ -6,6 +6,7 @@
  *
  *  Created on: 30 dec 2017
  *      Author: elektros230
+ *
  **********************************************************/
 
 #ifndef BIOZAP_FUNC_H_
@@ -87,7 +88,6 @@ byte labelsPointer = 0;                 // TODO: Pointer of end label table
 
 
 //Serial buffer
-//char *memBuffer;
 char memBuffer[PROGRAM_BUFFER];
 
 const unsigned long pauseTimeOut = 600000UL;    // 600000 Time of waiting in pause state as turn power off. (60000 = 1 min.)
