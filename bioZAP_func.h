@@ -19,7 +19,7 @@
 #include <Arduino.h>
 
 #ifdef MULTIZAP
-#include <multiZAP_def.h>
+#include "multiZAP_def.h"
 //#include <multiZAP_def.h>
 //#include <multiZAP_lcd.h>
 //#include <DS1803.h>

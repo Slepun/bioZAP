@@ -8,10 +8,14 @@
  *      Author: elektros230 & hehaka
  **********************************************************/
 
-#include "Arduino.h"
-#include <bioZAP_func.h>
+#include <Arduino.h>
+#include "bioZAP_func.h"
+
+
 
 #ifdef MULTIZAP
+#include "multiZAP_def.h"
+
 void wipersON(){
   ds1803.set_wiper0(wiper0);
   ds1803.set_wiper1(wiper1);
