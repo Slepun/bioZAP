@@ -12,9 +12,10 @@
 #define BIOZAP_FUNC_H_
 
 //Target device definition
+//TODO: Automate switch based on project include definition file
 #define MULTIZAP
 //#define FREE_PEMF
-//
+
 #include <Arduino.h>
 
 #ifdef MULTIZAP
@@ -27,11 +28,10 @@
 
 
 
-
 //BIOzap
 #define WELCOME_SCR "Free BIOzap interpreter welcome! See https://biotronika.pl"
 #define PROGRAM_SIZE 1000     	// Maximum program size
-#define PROGRAM_BUFFER 100    	// SRAM buffer size, used for script loading  TODO lack of memory
+#define PROGRAM_BUFFER 128    	// SRAM buffer size, used for script loading  TODO lack of memory
 #define MAX_CMD_PARAMS 3      	// Count of command params
 #define LCD_SCREEN_LINE 1     	// LCD user line number, -1 = no lcd, 0 = first, 1= second
 #define MIN_FREQ_OUT 1        	//  0.01 Hz
@@ -86,7 +86,7 @@ byte wiper0 = 0;
 byte wiper1 = 0;
 #endif
 
-
+//TODO: hehaka
 //Labels & jumps
 String labelName[MAX_LABELS];           // TODO: Labels names e.g. :MY_LABEL
 unsigned int labelPointer[MAX_LABELS];  // TODO: Next line of label
@@ -131,6 +131,10 @@ void rec(unsigned int Freq, unsigned long period);  //deprecated
 void wait( unsigned long period);
 void exe();
 void scan(unsigned long Freq, unsigned long period);
+ int mem();
+void ls();
+void rm();
+void cbat();
 
 
 #ifdef MULTIZAP

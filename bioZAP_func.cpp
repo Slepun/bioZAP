@@ -12,15 +12,6 @@
 #include <bioZAP_func.h>
 
 #ifdef MULTIZAP
-//
-#endif
-
-#ifdef FREE_PEMF
-
-#endif
-
-///////////////  BIOzap BEGINING  ///////////////////
-
 void wipersON(){
   ds1803.set_wiper0(wiper0);
   ds1803.set_wiper1(wiper1);
@@ -31,6 +22,12 @@ void wipersOFF(){
   ds1803.set_wiper1(0);
   ad9850.powerDown();
 }
+#endif
+
+#ifdef FREE_PEMF
+
+#endif
+
 
 String formatLine(int adr, String line){
   String printLine;
@@ -49,94 +46,32 @@ void executeCmd(String cmdLine, boolean directMode){
 
     if ( param[0]=="mem" ) {
 // Upload therapy to EEPROM
+    	mem();
 
-      if (param[1]=="\0") {
-        eepromUpload();
-
-      } else if (param[1]=="@") {
-        //Find script end
-        int endAdr=0;
-        for (int i=0; i<PROGRAM_SIZE; i++){
-          if ((byte)EEPROM.read(i)==255 || (char)EEPROM.read(i)=='@'){
-            endAdr=i;
-
-            break;
-          }
-        }
-        Serial.println(formatLine(endAdr,"appending from..."));
-        eepromUpload(endAdr);
-
-      } else if (param[1].toInt()>0 && param[1].toInt()<PROGRAM_SIZE) {
-        eepromUpload(param[1].toInt());
-      } else {
-        Serial.print("Error: unknown parameter ");
-        Serial.println(param[1]);
-      }
 
     } else if ( param[0]=="ls" ) {
 //List therapy
-
-      if (param[1]=="-n") {
-
-
-        Serial.println("Adr  Command");
-
-
-        int adr=0;
-        int endLine;
-        String line;
-
-        while ((endLine = readEepromLine(adr,line)) && (adr<PROGRAM_SIZE) ){
-          //if (line.charAt(0)=='@') break;
-
-
-          Serial.print(formatLine(adr,line));
-
-          adr = adr + endLine;
-       }
-
-       //End marker informs an user where start append program
-       if (adr<PROGRAM_SIZE) Serial.println(formatLine(adr,"@"));
-
-      } else {
-
-        for(int i=0; i<PROGRAM_SIZE; i++){
-          char eeChar=(char)EEPROM.read(i);
-          if ((eeChar=='@') || (eeChar==char(255))) break;
-          //if (eeChar==char(255)) break;
-          Serial.print(eeChar);
-        }
-      }
+    	ls();
 
     } else if (param[0].charAt(0)=='#') {
 // Comment
+    	;
 
-      ;
+
     } else if (param[0].charAt(0)==':') {
 // Label (ignore)
-    	//TODO: for hehaka
-
-      ;
+//TODO: for hehaka
+    	;
 
 
     } else if (param[0]==""){
 // Emptyline
+    	;
 
-      ;
 
     } else if (param[0]=="rm"){
-      // Remove, clear terapty
-
-        for(int i=0; i<PROGRAM_SIZE; i++){
-        	EEPROM.put(i, 255);
-
-
-        	if (!(i % 128)) Serial.print(".");
-
-        }
-
-
-      	Serial.println("OK");
+// Remove, clear script therapy from memory
+    	rm();
 
 
     } else if (param[0]=="print"){
@@ -145,104 +80,71 @@ void executeCmd(String cmdLine, boolean directMode){
     	//TODO: message(param[1]);
 		#endif
 
-      if (cmdLine.length()>6) {
-
-        Serial.println(cmdLine.substring(6,cmdLine.length()-1));
-
+      if (cmdLine.length()>6) {   //TODO: I don't remember why 6 - to check (elektros)
+    	  Serial.println(cmdLine.substring(6,cmdLine.length()-1));
       } else {
-
-        Serial.println();
-
+    	  Serial.println();
       }
+
 
     } else if (param[0]=="bat"){
 // Print battery voltage
-
-
-        //Serial.println( int(analogRead(batPin)*BATTERY_VOLTAGE_RATIO));
         Serial.println(bat());
 
-        ;
+
     } else if (param[0]=="cbat"){
 // Calibrate battery voltage
-
-        //Correction factor
-        byte i = 100 * param[1].toInt()/(int(analogRead(batPin)*BATTERY_VOLTAGE_RATIO));
-
-        EEPROM.put(EEPROM_BATTERY_CALIBRATION_ADDRESS, i);
-
-
-        Serial.println("OK");
+    	cbat();
 
 
     } else if (param[0]=="hr"){
 // Print heart rate
-
-
         Serial.println(hr);
 
-        ;
+
     } else if (param[0]=="beep"){
 // Beep [time_ms]
-
         beep(param[1].toInt());
-
-
         Serial.println("OK");
 
 
     } else if (param[0]=="off"){
 // Turn off
+    	off();
 
-      off();
 
     } else if (param[0]=="chp"){
 // Change output signal polarity
-
-
     	Serial.println("Error: multiZAP doesn't support");
 
-    	;
+
     } else if (param[0]=="wait"){
 // Wait millis
-
     	wait(param[1].toInt());
-
-
       	Serial.println("OK");
 
 
     } else if (param[0]=="freq" || param[0]=="rec" || param[0]=="sin"){
 // Generate rectangle signal - rec [freq] [time_sec]
-
+    	//TODO: Different result functions - to divide
     	freq(param[1].toInt(), param[2].toInt());
-
-
       	Serial.println("OK");
 
 
     } else if (param[0]=="scan"){
-      // Scan from lastFreq  - scan [freq to] [time_ms]
-
+// Scan from lastFreq  - scan [freq to] [time_ms]
     	scan(param[1].toInt(), param[2].toInt());
-
-
     	Serial.println("OK");
 
 
-      //void scan(unsigned int freq, unsigned long period){
-
     } else if (param[0]=="exe"){
-      // Execute eeprom program only in direc mode
-      if ( directMode) {
-        exe();
-      } else {
+// Execute eeprom program only in direc mode
+    	if ( directMode) {
+    		exe();
+    	} else {
+    		Serial.println("Error: can't execute program from eeprom program!");
+    	}
 
-
-        Serial.println("Error: can't execute program from eeprom program!");
-
-      }
-      //param[0]="";
 
     }  else {
 //Unknown command
@@ -252,6 +154,106 @@ void executeCmd(String cmdLine, boolean directMode){
     }
 
 
+}
+
+///////////////////////////// bioZAP functions ///////////////////////////////
+
+#ifdef MULTIZAP
+void pbar(uint8_t percent, uint32_t period){
+// Scaling progress bar on lcd, and show remaining time
+//TODO: elektros
+	;
+}
+
+void print(String *str){
+// Shows script therapy message on lcd display
+// TODO: elektros
+	;
+}
+#endif
+
+void cbat(){
+// Calibrate battery voltage
+
+	//Correction factor
+	byte i = 100 * param[1].toInt()/(int(analogRead(batPin)*BATTERY_VOLTAGE_RATIO));
+
+	EEPROM.put(EEPROM_BATTERY_CALIBRATION_ADDRESS, i);
+	Serial.println("OK");
+}
+
+void rm(){
+// Remove, clear script therapy from memory
+
+	for(int i=0; i<PROGRAM_SIZE; i++){
+		EEPROM.put(i, 255);
+		if (!(i % 128)) Serial.print(".");
+	}
+	Serial.println("OK");
+}
+
+void ls(){
+//List script therapy
+	int adr=0;
+	int endLine;
+	String line;
+
+	if (param[1]=="-n") {
+		Serial.println("Adr  Command");
+
+		while ((endLine = readEepromLine(adr,line)) && (adr<PROGRAM_SIZE) ){
+		  Serial.print(formatLine(adr,line));
+		  adr = adr + endLine;
+		}
+
+		//End marker (@) informs an user where to start appending of program
+		if (adr<PROGRAM_SIZE) {
+			Serial.println(formatLine(adr,"@"));
+		}
+
+	} else {
+
+		for(int i=0; i<PROGRAM_SIZE; i++){
+			char eeChar=(char)EEPROM.read(i);
+
+			if ((eeChar=='@') || (eeChar==char(255))) {
+				break;
+			}
+
+			Serial.print(eeChar);
+		}
+	}
+
+}
+
+int mem(){
+// Upload therapy to EEPROM
+
+	if (param[1]=="\0") {
+		eepromUpload();
+
+	} else if (param[1]=="@") {
+		//Find script end
+		int endAdr=0;
+		for (int i=0; i<PROGRAM_SIZE; i++){
+		  if ((byte)EEPROM.read(i)==255 || (char)EEPROM.read(i)=='@'){
+			endAdr=i;
+
+			break;
+		  }
+		}
+		Serial.println(formatLine(endAdr,"appending from..."));
+		eepromUpload(endAdr);
+
+	} else if (param[1].toInt()>0 && param[1].toInt()<PROGRAM_SIZE) {
+		eepromUpload(param[1].toInt());
+	} else {
+		Serial.print("Error: unknown parameter ");
+		Serial.println(param[1]);
+		return -1;
+	}
+
+	return 0;
 }
 
 void exe(){
@@ -380,6 +382,7 @@ void freq(unsigned int Freq, unsigned long period) {
 }
 #endif
 
+
 int rec(){
 
 	//-1 not supported
@@ -460,6 +463,8 @@ void beep( unsigned int period ) {
   digitalWrite(buzerPin, LOW);
 }
 
+/***************** bioZAP functions end *************************/
+
 int readEepromLine(int fromAddress, String &lineString){
   //Read one line from EEPROM memory
   int i = 0;
@@ -504,7 +509,6 @@ void getParams(String &inputString){
 }
 
 
-///////////////  BIOzap END  ///////////////////
 
 void checkBattLevel() {
   //Check battery level
