@@ -5,9 +5,6 @@
  *      Author: elektros230
  */
 
-
-//#include <Arduino.h>
-
 #ifndef MULTIZAP_DEF_H_
 #define MULTIZAP_DEF_H_
 
@@ -21,7 +18,6 @@
 #include <EEPROM.h>
 #include <DS1803.h>
 #include <AD9850.h>
-//#include <multiZAP_menu.h>
 
 #ifndef INPUTS_DEF_
 #define INPUTS_DEF_
