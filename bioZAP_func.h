@@ -13,8 +13,8 @@
 
 //Target device definition
 //TODO: Automate switch based on project include definition file
-#define MULTIZAP
-//#define FREE_PEMF
+//#define MULTIZAP
+#define FREE_PEMF
 
 #include <Arduino.h>
 
