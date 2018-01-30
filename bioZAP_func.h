@@ -17,6 +17,7 @@
 //#define FREE_PEMF
 
 #include <Arduino.h>
+#include "bioZAP_commands.h"
 
 #ifdef MULTIZAP
 #include "multiZAP_def.h"
@@ -139,8 +140,5 @@ void print(String *str); 							//TODO
 void wipersON();
 void wipersOFF();
 #endif
-
-
-
 
 #endif /* BIOZAP_FUNC_H_ */

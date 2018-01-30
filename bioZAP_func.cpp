@@ -46,7 +46,29 @@ void executeCmd(String cmdLine, boolean directMode){
   // Main interpreter function
   //digitalWrite(powerPin, HIGH);
   getParams(cmdLine);
+  eBioZapCmds bioZapCpmmandE = (eBioZapCmds) cmdToValue(param[0]);
 
+  //TODO Slepun: reconsider & rewrite switch
+  switch ( bioZapCommandE )
+  {
+	  case CMD_MEM:
+	  {
+		  // Upload therapy to EEPROM
+		  mem();
+		  break;
+	  }
+	  case CMD_LS:
+	  {
+		  //List therapy
+		  ls();
+		  break;
+	  }
+	  case CMD_HASH:
+	  {
+		  break;
+	  }
+
+  }
 
     if ( param[0]=="mem" ) {
 // Upload therapy to EEPROM
@@ -268,7 +290,7 @@ void exe(){
 
 	while (int endLine = readEepromLine(adr,line)){
 
-
+//TODO Slepun execute line which is number, consider repeat
 		Serial.print("executing: ");
 		Serial.print(line);
 
@@ -640,10 +662,10 @@ void eepromUpload(int adr) {
     flagCompleted = false;
     while (!flagCompleted){
 
-      flagCompleted = !(i+adr<PROGRAM_SIZE) || (memBuffer[b]=='@') || !(b < endBuffer);
+      flagCompleted = !(i+adr<PROGRAM_SIZE) || (memBuffer[b]=='@') || !(b < endBuffer);//TODO Slepun rewrite it or make comment
       if (memBuffer[b]==';') memBuffer[b]='\n';   //Semicollon as end line LF (#10) for windows script
       if (memBuffer[b]=='\r') memBuffer[b] = ' '; //#13 -> space, No continue because of changing script length
-      EEPROM.write(i+adr, memBuffer[b]);
+      EEPROM.write(i+adr, memBuffer[b]); //memBuffer is filled in readSerial2Buffer()
       //Serial.print(memBuffer[b]);
       i++; b++;
     }
@@ -654,7 +676,7 @@ void eepromUpload(int adr) {
   //eepromLoad=false;
 }
 
-boolean readSerial2Buffer(int &endBuffer) {
+boolean readSerial2Buffer(int &endBuffer) {//TODO Slepun analyse
     int i = 0; //buffer indicator
     char c;
 
@@ -713,4 +735,39 @@ boolean readSerial2Buffer(int &endBuffer) {
     }
   return Xoff;
 
+}
+
+eBioZapCmds cmdToValue(String *cmdName)
+{//TODO Slepun: make it independent function. No connection with external array aBioZapCmds
+	int i = 0;
+
+	if( 0 != cmdName )
+	{
+		for(i=0; i < CMD_LAST_ENUM; i++)
+		{
+			if( *cmdName == aBioZapCmds[i] )
+			{
+				break;
+			}
+		}
+	}
+	return (eBioZapCmds)i;
+}
+
+
+String valueTocmd(eBioZapCmds value)
+{//TODO Slepun: make it independent function. No connection with external array aBioZapCmds
+	String retCmd = "";
+
+	eBioZapCmds eIter = CMD_UNK; //first enum element
+	for(eIter; eIter < CMD_LAST_ENUM; eIter++)
+	{
+		if( value == eIter )
+		{
+			retCmd = aBioZapCmds[eIter];
+			break;
+		}
+	}
+
+	return retCmd;
 }
